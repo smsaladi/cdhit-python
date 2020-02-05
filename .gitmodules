@@ -1,0 +1,3 @@
+[submodule "cdhit/lib"]
+	path = cdhit/lib
+	url = git@github.com:weizhongli/cdhit.git
