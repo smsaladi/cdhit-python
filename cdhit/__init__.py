@@ -1,1 +1,1 @@
-from cdhit import *
+from .cdhitlib import *

@@ -1,3 +1,5 @@
+
+import os.path
 import glob
 import shutil
 
@@ -7,24 +9,27 @@ from Cython.Build import cythonize
 
 import numpy as np
 
+lib_root = "cdhit/cdhitlib/lib/"
+
 # rename .c++ files to .cpp
 shutil.copyfile(
-    "cdhit/lib/cdhit-common.c++",
-    "cdhit/lib/cdhit-common.cpp",
+    os.path.join(lib_root, "cdhit-common.c++"),
+    os.path.join(lib_root, "cdhit-common.cpp"),
 )
+
 ext_files = [
-    "cdhit/lib/cdhit-common.cpp",
-    "cdhit/lib/cd-hit-auxtools/bioSequence.cxx",
+    os.path.join(lib_root, "cdhit-common.cpp"),
+    os.path.join(lib_root, "cd-hit-auxtools", "bioSequence.cxx"),
 ]
-ext_files.extend(glob.glob("cdhit/lib/cd-hit-auxtools/mintlib/*.cxx"))
-ext_files.extend(glob.glob("*.pyx"))
+ext_files.extend(glob.glob(os.path.join(lib_root, "cd-hit-auxtools", "mintlib", "*.cxx")))
+ext_files.extend(glob.glob("cdhit/cdhitlib/*.pyx"))
 
 cdhitlib = Extension(
-    "cdhitlib.lib",
-    ext_files,
-    include_dirs=["cdhit/lib",
-        "cdhit/lib/cd-hit-auxtools",
-        "cdhit/lib/cd-hit-auxtools/mintlib",
+    "cdhit.cdhitlib",
+    sources=ext_files,
+    include_dirs=[lib_root,
+        os.path.join(lib_root, "cd-hit-auxtools"),
+        os.path.join(lib_root, "cd-hit-auxtools", "mintlib"),
         np.get_include()],
     language="c++"
 )
@@ -50,5 +55,5 @@ setup(
         'biopython',
     ],
     test_suite="pytest",
-    ext_modules=cythonize([cdhitlib], language="c++", language_level="3")
+    ext_modules=cythonize([cdhitlib], language_level="3", language="c++")
 )

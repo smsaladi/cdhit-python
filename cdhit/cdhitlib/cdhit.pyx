@@ -4,22 +4,36 @@ Wrapper for cdhit c++ code
 """
 # distutils: language = c++
 
-cimport cdhitlib
+STUFF = "Hi"
 
-cdef cluster():
-    """
-    // InitNAA( MAX_UAA )
-    // options.NAAN = NAAN_array[options.NAA]
-    // seq_db.NAAN = NAAN_array[options.NAA]
+from . cimport cdhitlib as lib
 
-    // seq_db.Read( db_in.c_str(), options )
-    // seq_db.SortDivide( options )
+cdef lib.Options options = lib.options
+lib.InitNAA(lib.MAX_UAA)
 
-    // seq_db.DoClustering( options )
-    // seq_db.WriteClusters( db_in.c_str(), db_out.c_str(), options )
+def cluster():
+    options = new lib.Options()
+    seq_db = new lib.SequenceDB()
 
-    // seq_db.WriteExtra1D( options )
-    """
+    # int ret = options.SetOptions( argc, argv ) #  (if returns zero then issue)
+    # if ret == 0:
+    #     raise ValueError print_usage(argv[0])
+    
+    options.Validate()
+
+    lib.InitNAA(lib.MAX_UAA)
+    options.NAAN = lib.NAAN_array[options.NAA]
+    seq_db.NAAN = lib.NAAN_array[options.NAA]
+
+    seq_db.Read(options.input.c_str(), options[0])
+    
+    seq_db.SortDivide(options[0])
+    seq_db.DoClustering(options[0])
+
+    seq_db.WriteClusters(options.input.c_str(), options.output.c_str(), options[0])
+
+    seq_db.WriteExtra1D(options[0])
+
     return
 
 cdef cluster_est():
